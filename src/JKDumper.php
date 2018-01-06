@@ -41,6 +41,13 @@ class JKDumper
 
     public function endTime($task = "debug")
     {
+        if (!array_key_exists($task, $this->timingTasks)) {
+            if ($this->checkForLogger()) {
+                $this->logger->info('ERROR. Task has not been started: '.$task);
+            }
+            return 0;
+        }
+
         $startTime = $this->timingTasks[$task];
 
         if (isset($startTime)) {
@@ -73,7 +80,7 @@ class JKDumper
             return false;
         }
 
-        $this->logger->debug(self::vdump($var));
+        $this->logger->debug($this->vdump($var));
         return true;
     }
 
@@ -86,159 +93,40 @@ class JKDumper
         return self::$sapi;
     }
 
-    public static function vdump($var, $echo = false)
+    public function vdump($var, $echo = false)
     {
-        if (!extension_loaded('xdebug')) {
-            ob_start();
-            $output = ob_get_clean();
-        } else {
-            $output = self::exportVar($var);
+        if (extension_loaded('xdebug')) {
+            $xd_ovd = ini_get("xdebug.overload_var_dump");
+            //we need to disable xdebug pretty dumping
+            ini_set("xdebug.overload_var_dump", 0);
         }
 
+        ob_start();
+        var_dump($var);
+        $output = ob_get_clean();
+
         // neaten the newlines and indents
-        $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", $output);
+        $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", trim($output));
 
         if (self::getSapi() == 'cli') {
-            $output = PHP_EOL
-                    . PHP_EOL . $output
-                    . PHP_EOL;
+            $output = $output;
         } else {
-            if (!extension_loaded('xdebug') and $echo) {
-                $output = htmlspecialchars($output, ENT_QUOTES);
-            }
+            $output = htmlspecialchars($output, ENT_QUOTES);
         }
 
         if ($echo) {
-            echo("<pre>".trim($output)."</pre>");
-        }
-
-        return trim($output);
-    }
-
-    public static function export($var, $depth, $indent, $varObject = null)
-    {
-        switch (self::getType($var)) {
-            case 'boolean':
-                return ($var) ? 'true' : 'false';
-            case 'integer':
-                return $var;
-
-            case 'float':
-                return $var;
-            case 'string':
-                if (trim($var) == '') {
-                    return "''";
-                }
-                return "'" . $var . "'";
-            case 'array':
-                return self::array($var, $depth - 1, $indent + 1);
-            case 'resource':
-                $metadata = stream_get_meta_data($var);
-                return '(resource) '.$metadata['uri'];
-            case 'null':
-                return 'null';
-
-            default:
-                return self::object($var, $depth - 1, $indent + 1, $varObject);
-        }
-    }
-
-    public static function object($var, $depth, $indent, $prevObject = null)
-    {
-        $out = '';
-        $props = array();
-
-        if ($var == $prevObject) {
-            return $out = '*RECURSION*';
-        }
-
-        $className = get_class($var);
-        $out .= 'object(' . $className . ') {';
-
-        if ($depth > 0) {
-            $end = "\n" . str_repeat("    ", $indent - 1);
-            $break = "\n" . str_repeat("    ", $indent);
-            $objectVars = get_object_vars($var);
-
-            foreach ($objectVars as $key => $value) {
-                $value = self::export($value, $depth - 1, $indent, $var);
-                $props[] = "$key => " . $value;
+            if (self::getSapi() == 'cli') {
+                echo(PHP_EOL . $output . PHP_EOL);
+            } else {
+                echo("<pre>".$output."</pre>");
             }
-
-            $out .= $break . implode($break, $props) . $end;
         }
 
-        $out .= '}';
-
-        return $out;
-    }
-
-    public static function array(array $var, $depth, $indent)
-    {
-        $out = "array (".count($var).") [";
-        $n = $break = $end = null;
-
-        if (!empty($var)) {
-            $n = "\n";
-            $break = "\n" . str_repeat("    ", $indent);
-            $end = "\n" . str_repeat("    ", $indent - 1);
+        if (extension_loaded('xdebug')) {
+            //lets get back xdebug pretty dumping state
+            ini_set("xdebug.overload_var_dump", $xd_ovd);
         }
 
-        if ($depth >= 0) {
-            foreach ($var as $key => $val) {
-                if (json_encode($val) !== json_encode($var)) {
-                    $val = self::export($val, $depth, $indent);
-                } else {
-                    $val = '[recursion]';
-                }
-                $vars[] = $break . self::exportVar($key) . ' => ' . $val;
-            }
-        } else {
-            $vars[] = $break . '[maximum depth reached]';
-        }
-
-        return $out . implode(',', $vars) . $end . ']';
-    }
-
-    public static function getType($var)
-    {
-        if (is_object($var)) {
-            return get_class($var);
-        }
-
-        if (is_null($var)) {
-            return 'null';
-        }
-
-        if (is_string($var)) {
-            return 'string';
-        }
-
-        if (is_array($var)) {
-            return 'array';
-        }
-
-        if (is_int($var)) {
-            return 'integer';
-        }
-
-        if (is_bool($var)) {
-            return 'boolean';
-        }
-
-        if (is_float($var)) {
-            return 'float';
-        }
-
-        if (is_resource($var)) {
-            return 'resource';
-        }
-
-        return 'unknown';
-    }
-
-    public static function exportVar($var, $depth = 10)
-    {
-        return self::export($var, $depth, 0);
+        return $output;
     }
 }
