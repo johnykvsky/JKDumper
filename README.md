@@ -33,7 +33,7 @@ If logger is set, then benchmarking is logged. Library use var_dump for sumping 
 
 ``` php
 //dump variables
-$dumper = new johnykvsky\Utils\JKDumper();
+$dumper = new \johnykvsky\Utils\JKDumper();
 echo $dumper::vdump('test');
 
 //benchmark, parameter is optional
@@ -47,10 +47,10 @@ $logger = new \Katzgrau\KLogger\Logger(__DIR__.'/files');
 $dmp->setLogger($logger)
 $dmp->log($request);
 //or, in other file, PHP7
-johnykvsky\Utils\JKDumper::instance()::log($response);
-johnykvsky\Utils\JKDumper::instance()::vdump($parameters);
+\johnykvsky\Utils\JKDumper::instance()::log($response);
+\johnykvsky\Utils\JKDumper::instance()::vdump($parameters);
 //or, in other file, PHP5
-$dmpr = johnykvsky\Utils\JKDumper::instance();
+$dmpr = \johnykvsky\Utils\JKDumper::instance();
 $dmpr::log($response);
 $dmpr::vdump($query);
 
