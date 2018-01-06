@@ -122,7 +122,7 @@ class JKDumper
             }
         }
 
-        if (extension_loaded('xdebug')) {
+        if (isset($xd_ovd)) {
             //lets get back xdebug pretty dumping state
             ini_set("xdebug.overload_var_dump", $xd_ovd);
         }
