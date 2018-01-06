@@ -43,7 +43,7 @@ $dmp->startTime('usersQuery'); //this is also written into logs, if logger is se
 echo $dmp->endTime('usersQuery'); //this is also written into logs, if logger is set
 
 //logging
-$logger = new Katzgrau\KLogger\Logger(__DIR__.'/files');
+$logger = new \Katzgrau\KLogger\Logger(__DIR__.'/files');
 $dmp->setLogger($logger)
 $dmp->log($request);
 //or, in other file, PHP7
