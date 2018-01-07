@@ -70,7 +70,7 @@ Log file example:
 
 It's good to look at log library to see how it works and how it can be customized: [katzgrau][link-klogger]
 
-This is my choice of logger, but it can be replaced with anything compatibile with \Psr\Log\AbstractLogger
+This is my choice of logger, but it can be replaced with anything compatibile with PSR-3 LoggerInterface
 
 
 ## Testing

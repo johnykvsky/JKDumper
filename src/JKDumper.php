@@ -2,8 +2,7 @@
 
 namespace johnykvsky\Utils;
 
-use PHPUnit\Runner\Exception;
-
+use \Psr\Log\LoggerInterface;
 
 class JKDumper
 {
@@ -67,7 +66,7 @@ class JKDumper
 
     public function checkForLogger()
     {
-        if (empty($this->logger) or !($this->logger instanceof \Psr\Log\AbstractLogger)) {
+        if (empty($this->logger) or !($this->logger instanceof LoggerInterface)) {
             return false;
         }
 
