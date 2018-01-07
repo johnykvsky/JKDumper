@@ -39,7 +39,11 @@ $dumper = new \johnykvsky\Utils\JKDumper();
 echo $dumper->vdump('test');
 
 //or, better for dirty debugging:
-\johnykvsky\Utils\JKDumper::instance()->vdump('test');
+echo \johnykvsky\Utils\JKDumper::instance()->vdump('test');
+
+//if you pass true as second parameter to vdump, result will be in <pre></pre> tags (if in CLI, PHP_EOL will be added)
+echo \johnykvsky\Utils\JKDumper::instance()->vdump('test', true);
+//result: <pre>test</pre>
 
 //benchmark start, parameter is optional
 \johnykvsky\Utils\JKDumper::instance()->startTime('usersQuery'); //info is also written into logs, if logger is set
