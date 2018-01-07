@@ -62,6 +62,13 @@ $logger = new \Katzgrau\KLogger\Logger(__DIR__.'/files');
 //and now we ca dump variables to logs anywhere, anytime
 \johnykvsky\Utils\JKDumper::instance()->log($request);
 
+//you can store results:
+$data['req'] = \johnykvsky\Utils\JKDumper::instance()->vdump($request);
+$data['res'] = \johnykvsky\Utils\JKDumper::instance()->vdump($response);
+//and log them later in one go:
+\johnykvsky\Utils\JKDumper::instance()->log($data);
+
+
 ```
 
 Log file example:
