@@ -1,7 +1,7 @@
 {
     "name": "johnykvsky/jkdumper",
     "type": "library",
-    "description": "dumper",
+    "description": "JKDumper is one-man-army quick'n'dirty debugging-logging tool",
     "keywords": [
         "johnykvsky",
         "dumper"

@@ -7,7 +7,7 @@
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-JKDumper is one-man-army quick'n'dirty debug tool. Good for both:
+JKDumper is one-man-army quick'n'dirty debugging-logging tool. Good for both:
 - legacy applications, where you have spaghetti code
 - new projects, where you need to inject logger through 4 services just to dump some variables fot one time.
 
