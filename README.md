@@ -83,6 +83,29 @@ It's good to look at log library to see how it works and how it can be customize
 
 This is my choice of logger, but it can be replaced with anything compatibile with PSR-3 LoggerInterface
 
+Nice way to make it a bit easier is to create function, ie. right after autoload:
+
+```
+require '../vendor/autoload.php';
+
+if (!function_exists('dde')) {
+    function dde($var, $die = false) {
+        \johnykvsky\Utils\JKDumper::instance()->vdump($var, true);
+        if ($die) {
+        	die;
+        }
+    }
+}
+
+```
+
+This will allow us to dump variable to screen like this, with optional stopping further execution (second parameter):
+```
+dde($myVariable);
+dde($myOtherVariable,1);
+
+```
+
 
 ## Testing
 

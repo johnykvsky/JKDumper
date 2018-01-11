@@ -8,7 +8,6 @@ class JKDumper
 {
     public $timingTasks;
     public static $instance;
-    public static $sapi;
     public $logger;
 
     public static function instance()
@@ -83,15 +82,6 @@ class JKDumper
         return true;
     }
 
-    public static function getSapi()
-    {
-        if (self::$sapi === null) {
-            self::$sapi = PHP_SAPI;
-        }
-
-        return self::$sapi;
-    }
-
     public function vdump($var, $echo = false)
     {
         if (extension_loaded('xdebug')) {
@@ -107,14 +97,8 @@ class JKDumper
         // neaten the newlines and indents
         $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", trim($output));
 
-        if (self::getSapi() == 'cli') {
-            $output = $output;
-        } else {
-            $output = htmlspecialchars($output, ENT_QUOTES);
-        }
-
         if ($echo) {
-            if (self::getSapi() == 'cli') {
+            if (in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg')) || substr(PHP_SAPI, 0, 3) == 'cgi') {
                 echo(PHP_EOL . $output . PHP_EOL);
             } else {
                 echo("<pre>".$output."</pre>");

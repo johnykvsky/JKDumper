@@ -13,11 +13,6 @@ class JKDumperTest extends TestCase
         $this->logger = new Katzgrau\KLogger\Logger(__DIR__.'/files');
     }
 
-    public function testSapi()
-    {
-        $this->assertEquals(PHP_SAPI, $this->dumper->getSapi());
-    }
-
     public function testInstance()
     {
         $instance = johnykvsky\Utils\JKDumper::instance();
