@@ -12,12 +12,11 @@ class JKDumper
 
     public static function instance()
     {
-        if (!empty(self::$instance)) {
-            return self::$instance;
+        if (!(self::$instance instanceof self)) 
+        {
+            self::$instance = new self;
         }
-
-        self::$instance = new self();
-
+        
         return self::$instance;
     }
 
