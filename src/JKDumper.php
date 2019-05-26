@@ -106,6 +106,19 @@ class JKDumper
         }
         return true;
     }
+    
+    /**
+     * @param string $output
+     * @return void
+     */
+    private function echoData(string $output): void
+    {
+        if (in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg')) || substr(PHP_SAPI, 0, 3) == 'cgi') {
+            echo(PHP_EOL . $output . PHP_EOL);
+        } else {
+            echo("<pre>".$output."</pre>");
+        }
+    }
 
     /**
      * @param mixed $var
@@ -132,11 +145,7 @@ class JKDumper
         $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", trim($output));
 
         if ($echo) {
-            if (in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg')) || substr(PHP_SAPI, 0, 3) == 'cgi') {
-                echo(PHP_EOL . $output . PHP_EOL);
-            } else {
-                echo("<pre>".$output."</pre>");
-            }
+            $this->echoData($output);
         }
 
         if (isset($xd_ovd)) {
