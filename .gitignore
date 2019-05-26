@@ -1,0 +1,8 @@
+vendor/
+.phpunit
+coverage.xml
+coverage/
+.settings/
+.project
+.buildpath
+/tests/logs/*

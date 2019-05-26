@@ -82,8 +82,8 @@ echo \johnykvsky\Utils\JKDumper::instance()->endTime('usersQuery'); //this is al
 
 //logging, somewhere in the code we need to create logger and pass it to JKDumper
 //usually it's good to do it somewhere at the beginning. index.php? base controller?
-//for KLogger parameter is path where we want to store logs
-$logger = new \Katzgrau\KLogger\Logger(__DIR__.'/files');
+//for JKLogger parameter is path where we want to store logs
+$logger = new \johnykvsky\Utils\JKLogger(__DIR__.'/files');
 \johnykvsky\Utils\JKDumper::instance()->setLogger($logger);
 
 //and now we ca dump variables to logs anywhere, anytime
@@ -106,7 +106,7 @@ Log file example:
 [2017-12-25 22:55:48.124536] [debug] 'test'
 ```
 
-It's good to look at log library to see how it works and how it can be customized: [katzgrau][link-klogger]
+It's good to look at log library to see how it works and how it can be customized: [jklogger][link-jklogger]
 
 This is my choice of logger, but it can be replaced with anything compatibile with PSR-3 LoggerInterface
 
@@ -142,4 +142,4 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-code-quality]: https://scrutinizer-ci.com/g/johnykvsky/JKDumper
 [link-downloads]: https://packagist.org/packages/johnykvsky/JKDumper
 [link-author]: https://github.com/johnykvsky
-[link-klogger]: https://github.com/katzgrau/KLogger
+[link-jklogger]: https://github.com/johnykvsky/JKLogger

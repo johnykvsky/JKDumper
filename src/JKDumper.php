@@ -2,15 +2,21 @@
 
 namespace johnykvsky\Utils;
 
-use \Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 class JKDumper
 {
+    /** @var float[] $timingTasks */
     public $timingTasks;
+    /** @var self $instance  */
     public static $instance;
+    /** @var LoggerInterface $logger */
     public $logger;
 
-    public static function instance()
+    /**
+     * @return self
+     */
+    public static function instance(): self
     {
         if (!(self::$instance instanceof self)) 
         {
@@ -20,12 +26,21 @@ class JKDumper
         return self::$instance;
     }
 
-    public function setLogger($logger)
+    /**
+     * @param LoggerInterface $logger
+     * @return void
+     */
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
 
-    public function startTime($task = "debug")
+    /**
+     * 
+     * @param string $task
+     * @return float
+     */
+    public function startTime(string $task = "debug"): float
     {
         $this->timingTasks[$task] = microtime(true);
 
@@ -36,7 +51,11 @@ class JKDumper
         return $this->timingTasks[$task];
     }
 
-    public function endTime($task = "debug")
+    /**
+     * @param string $task
+     * @return float
+     */
+    public function endTime(string $task = "debug"): float
     {
         if (!array_key_exists($task, $this->timingTasks)) {
             if ($this->checkForLogger()) {
@@ -47,22 +66,21 @@ class JKDumper
 
         $startTime = $this->timingTasks[$task];
 
-        if (isset($startTime)) {
-            $endTime = microtime(true) - $startTime;
-            //convert to millseconds (most common)
-            $endTime *= 1000;
+        $endTime = microtime(true) - $startTime;
+        //convert to millseconds (most common)
+        $endTime *= 1000;
 
-            if ($this->checkForLogger()) {
-                $this->logger->info(sprintf("Finished %s in %.3f milliseconds", $task, $endTime));
-            }
-
-            return $endTime;
+        if ($this->checkForLogger()) {
+            $this->logger->info(sprintf("Finished %s in %.3f milliseconds", $task, $endTime));
         }
 
-        return 0;
+        return $endTime;
     }
 
-    public function checkForLogger()
+    /**
+     * @return bool
+     */
+    public function checkForLogger(): bool
     {
         if (empty($this->logger) or !($this->logger instanceof LoggerInterface)) {
             return false;
@@ -71,17 +89,30 @@ class JKDumper
         return true;
     }
 
-    public function log($var)
+    /**
+     * @param mixed $var
+     * @return bool
+     */
+    public function log($var): bool
     {
         if (!$this->checkForLogger()) {
             return false;
         }
-
-        $this->logger->debug($this->vdump($var));
+        
+        $result = $this->vdump($var);
+        
+        if ($result) {
+            $this->logger->debug($result);
+        }
         return true;
     }
 
-    public function vdump($var, $echo = false)
+    /**
+     * @param mixed $var
+     * @param boolean $echo
+     * @return ?string
+     */
+    public function vdump($var, bool $echo = false): ?string
     {
         if (extension_loaded('xdebug')) {
             $xd_ovd = ini_get("xdebug.overload_var_dump");
@@ -93,6 +124,10 @@ class JKDumper
         var_dump($var);
         $output = ob_get_clean();
 
+        if (!$output) {
+            return null;
+        }
+        
         // neaten the newlines and indents
         $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", trim($output));
 

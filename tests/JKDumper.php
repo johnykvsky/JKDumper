@@ -10,7 +10,7 @@ class JKDumperTest extends TestCase
     protected function setUp()
     {
         $this->dumper = new johnykvsky\Utils\JKDumper();
-        $this->logger = new Katzgrau\KLogger\Logger(__DIR__.'/files');
+        $this->logger = new johnykvsky\Utils\JKLogger(__DIR__.'/logs');
     }
 
     public function testInstance()
