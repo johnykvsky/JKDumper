@@ -133,24 +133,23 @@ class JKDumper
             ini_set("xdebug.overload_var_dump", 0);
         }
 
-        ob_start();
-        var_dump($var);
-        $output = ob_get_clean();
+        try {
+            ob_start();
+            var_dump($var);
+            $output = ob_get_clean();
+          
+            // neaten the newlines and indents
+            $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", trim($output));
 
-        if (!$output) {
-            return null;
-        }
-        
-        // neaten the newlines and indents
-        $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", trim($output));
-
-        if ($echo) {
-            $this->echoData($output);
-        }
-
-        if (isset($xd_ovd)) {
-            //lets get back xdebug pretty dumping state
-            ini_set("xdebug.overload_var_dump", $xd_ovd);
+            if ($echo) {
+                $this->echoData($output);
+            }
+        } catch (\Exception $e) {
+            if (isset($xd_ovd)) {
+                //lets get back xdebug pretty dumping state
+                ini_set("xdebug.overload_var_dump", $xd_ovd);
+            }
+            return $e->getMessage();
         }
 
         return $output;
