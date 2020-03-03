@@ -116,6 +116,13 @@ This is my choice of logger, but it can be replaced with anything compatibile wi
 $ composer test
 ```
 
+## Code checking
+
+``` bash
+$ composer phpstan
+$ composer phpstan-max
+```
+
 ## Security
 
 If you discover any security related issues, please email johnykvsky@protonmail.com instead of using the issue tracker.

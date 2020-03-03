@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace johnykvsky\Utils;
 
 use Psr\Log\LoggerInterface;
@@ -57,6 +59,13 @@ class JKDumper
      */
     public function endTime(string $task = "debug"): float
     {
+        if (!is_array($this->timingTasks)) {
+            if ($this->checkForLogger()) {
+                $this->logger->info('ERROR. Empty timingTasks for task: '.$task);
+            }
+            return 0;
+        }
+
         if (!array_key_exists($task, $this->timingTasks)) {
             if ($this->checkForLogger()) {
                 $this->logger->info('ERROR. Task has not been started: '.$task);
@@ -128,9 +137,9 @@ class JKDumper
     public function vdump($var, bool $echo = false): ?string
     {
         if (extension_loaded('xdebug')) {
-            $xd_ovd = ini_get("xdebug.overload_var_dump");
+            $xd_ovd = ini_get('xdebug.overload_var_dump');
             //we need to disable xdebug pretty dumping
-            ini_set("xdebug.overload_var_dump", 0);
+            ini_set('xdebug.overload_var_dump', '0');
         }
 
         try {
@@ -147,9 +156,9 @@ class JKDumper
         } catch (\Exception $e) {
             if (isset($xd_ovd)) {
                 //lets get back xdebug pretty dumping state
-                ini_set("xdebug.overload_var_dump", $xd_ovd);
+                ini_set('xdebug.overload_var_dump', $xd_ovd);
             }
-            return $e->getMessage();
+            throw $e;
         }
 
         return $output;

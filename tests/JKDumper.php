@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use PHPUnit\Framework\TestCase;
 
 class JKDumperTest extends TestCase
@@ -7,7 +9,7 @@ class JKDumperTest extends TestCase
     public $dumper;
     public $logger;
 
-    protected function setUp()
+    protected function setUp():void
     {
         $this->dumper = new johnykvsky\Utils\JKDumper();
         $this->logger = new johnykvsky\Utils\JKLogger(__DIR__.'/logs');
@@ -28,7 +30,7 @@ class JKDumperTest extends TestCase
     public function testEndTime()
     {
         $startTime = $this->dumper->startTime();
-        sleep(0.2);
+        sleep(1);
         $endTime = $this->dumper->endTime();
         $this->assertEquals(true, is_float($endTime));
     }
