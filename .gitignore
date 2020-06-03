@@ -3,6 +3,7 @@ vendor/
 coverage.xml
 coverage/
 .settings/
+.idea/
 .project
 .buildpath
 /tests/logs/*

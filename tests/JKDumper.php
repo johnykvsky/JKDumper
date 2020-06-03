@@ -9,12 +9,6 @@ class JKDumperTest extends TestCase
     public $dumper;
     public $logger;
 
-    protected function setUp():void
-    {
-        $this->dumper = new johnykvsky\Utils\JKDumper();
-        $this->logger = new johnykvsky\Utils\JKLogger(__DIR__.'/logs');
-    }
-
     public function testInstance()
     {
         $instance = johnykvsky\Utils\JKDumper::instance();
@@ -63,5 +57,11 @@ class JKDumperTest extends TestCase
     {
         $this->dumper->setLogger($this->logger);
         $this->assertEquals(true, $this->dumper->log('test'));
+    }
+
+    protected function setUp(): void
+    {
+        $this->dumper = new johnykvsky\Utils\JKDumper();
+        $this->logger = new johnykvsky\Utils\JKLogger(__DIR__ . '/logs');
     }
 }

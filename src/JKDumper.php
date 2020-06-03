@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace johnykvsky\Utils;
 
+use Exception;
 use Psr\Log\LoggerInterface;
 
 class JKDumper
 {
+    /** @var self $instance */
+    public static $instance;
     /** @var float[] $timingTasks */
     public $timingTasks;
-    /** @var self $instance  */
-    public static $instance;
     /** @var LoggerInterface $logger */
     public $logger;
 
@@ -20,11 +21,10 @@ class JKDumper
      */
     public static function instance(): self
     {
-        if (!(self::$instance instanceof self)) 
-        {
+        if (!(self::$instance instanceof self)) {
             self::$instance = new self;
         }
-        
+
         return self::$instance;
     }
 
@@ -38,7 +38,7 @@ class JKDumper
     }
 
     /**
-     * 
+     *
      * @param string $task
      * @return float
      */
@@ -54,6 +54,18 @@ class JKDumper
     }
 
     /**
+     * @return bool
+     */
+    public function checkForLogger(): bool
+    {
+        if ($this->logger && $this->logger instanceof LoggerInterface) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param string $task
      * @return float
      */
@@ -61,14 +73,14 @@ class JKDumper
     {
         if (!is_array($this->timingTasks)) {
             if ($this->checkForLogger()) {
-                $this->logger->info('ERROR. Empty timingTasks for task: '.$task);
+                $this->logger->info('ERROR. Empty timingTasks for task: ' . $task);
             }
             return 0;
         }
 
         if (!array_key_exists($task, $this->timingTasks)) {
             if ($this->checkForLogger()) {
-                $this->logger->info('ERROR. Task has not been started: '.$task);
+                $this->logger->info('ERROR. Task has not been started: ' . $task);
             }
             return 0;
         }
@@ -87,18 +99,6 @@ class JKDumper
     }
 
     /**
-     * @return bool
-     */
-    public function checkForLogger(): bool
-    {
-        if (empty($this->logger) or !($this->logger instanceof LoggerInterface)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * @param mixed $var
      * @return bool
      */
@@ -107,26 +107,13 @@ class JKDumper
         if (!$this->checkForLogger()) {
             return false;
         }
-        
+
         $result = $this->vdump($var);
-        
+
         if ($result) {
             $this->logger->debug($result);
         }
         return true;
-    }
-    
-    /**
-     * @param string $output
-     * @return void
-     */
-    private function echoData(string $output): void
-    {
-        if (in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg')) || substr(PHP_SAPI, 0, 3) == 'cgi') {
-            echo(PHP_EOL . $output . PHP_EOL);
-        } else {
-            echo("<pre>".$output."</pre>");
-        }
     }
 
     /**
@@ -146,14 +133,14 @@ class JKDumper
             ob_start();
             var_dump($var);
             $output = ob_get_clean();
-          
+
             // neaten the newlines and indents
             $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", trim($output));
 
             if ($echo) {
                 $this->echoData($output);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (isset($xd_ovd)) {
                 //lets get back xdebug pretty dumping state
                 ini_set('xdebug.overload_var_dump', $xd_ovd);
@@ -162,5 +149,20 @@ class JKDumper
         }
 
         return $output;
+    }
+
+    /**
+     * @param string $output
+     * @return void
+     */
+    private function echoData(string $output): void
+    {
+        if (in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg'))
+            || substr(PHP_SAPI, 0, 3) === 'cgi')
+        {
+            echo(PHP_EOL . $output . PHP_EOL);
+        } else {
+            echo("<pre>" . $output . "</pre>");
+        }
     }
 }
