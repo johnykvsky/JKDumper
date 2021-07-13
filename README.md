@@ -2,10 +2,8 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Software License][ico-license]](LICENSE.md)
-[![Build Status][ico-travis]][link-travis]
-[![Coverage Status][ico-scrutinizer]][link-scrutinizer]
-[![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
+[![Build Status][ico-github-actions]][link-github-actions]
 
 JKDumper is one-man-army quick'n'dirty debugging-logging tool. Good for both:
 - legacy applications, where you have spaghetti code
@@ -138,15 +136,11 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 [ico-version]: https://img.shields.io/packagist/v/johnykvsky/JKDumper.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-travis]: https://img.shields.io/travis/johnykvsky/JKDumper/master.svg?style=flat-square
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/johnykvsky/JKDumper.svg?style=flat-square
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/johnykvsky/JKDumper.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/johnykvsky/JKDumper.svg?style=flat-square
+[ico-github-actions]: https://github.com/johnykvsky/JKDumper/actions/workflows/php.yml/badge.svg
 
 [link-packagist]: https://packagist.org/packages/johnykvsky/JKDumper
-[link-travis]: https://travis-ci.org/johnykvsky/JKDumper
-[link-scrutinizer]: https://scrutinizer-ci.com/g/johnykvsky/JKDumper/code-structure
-[link-code-quality]: https://scrutinizer-ci.com/g/johnykvsky/JKDumper
 [link-downloads]: https://packagist.org/packages/johnykvsky/JKDumper
 [link-author]: https://github.com/johnykvsky
 [link-jklogger]: https://github.com/johnykvsky/JKLogger
+[link-github-actions]: https://github.com/johnykvsky/JKDumper/actions
