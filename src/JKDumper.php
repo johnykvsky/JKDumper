@@ -9,119 +9,83 @@ use Psr\Log\LoggerInterface;
 
 class JKDumper
 {
-    /** @var self $instance */
-    public static $instance;
-    /** @var float[] $timingTasks */
-    public $timingTasks;
-    /** @var LoggerInterface $logger */
-    public $logger;
+    public static ?self $instance = null;
 
-    /**
-     * @return self
-     */
-    public static function instance(): self
+    private array $timingTasks;
+    private ?LoggerInterface $logger;
+
+    public function __construct(?LoggerInterface $logger = null)
+    {
+        $this->timingTasks = [];
+        $this->logger = $logger;
+    }
+
+    public static function instance(?LoggerInterface $logger = null): self
     {
         if (!(self::$instance instanceof self)) {
-            self::$instance = new self;
+            self::$instance = new self($logger);
         }
 
         return self::$instance;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger): void
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     *
-     * @param string $task
-     * @return float
-     */
     public function startTime(string $task = "debug"): float
     {
         $this->timingTasks[$task] = microtime(true);
-
-        if ($this->checkForLogger()) {
-            $this->logger->info(sprintf("Started timing %s", $task));
-        }
+        $this->logMessage(sprintf("Started timing %s", $task));
 
         return $this->timingTasks[$task];
     }
 
-    /**
-     * @return bool
-     */
-    public function checkForLogger(): bool
+    public function loggingEnabled(): bool
     {
-        if ($this->logger && $this->logger instanceof LoggerInterface) {
-            return true;
-        }
-
-        return false;
+        return $this->logger instanceof LoggerInterface;
     }
 
-    /**
-     * @param string $task
-     * @return float
-     */
     public function endTime(string $task = "debug"): float
     {
-        if (!is_array($this->timingTasks)) {
-            if ($this->checkForLogger()) {
-                $this->logger->info('ERROR. Empty timingTasks for task: ' . $task);
-            }
+        if (empty($this->timingTasks)) {
+            $this->logMessage('ERROR. Empty timingTasks for task: ' . $task);
             return 0;
         }
 
         if (!array_key_exists($task, $this->timingTasks)) {
-            if ($this->checkForLogger()) {
-                $this->logger->info('ERROR. Task has not been started: ' . $task);
-            }
+            $this->logMessage('ERROR. Task has not been started: ' . $task);
             return 0;
         }
 
         $startTime = $this->timingTasks[$task];
 
         $endTime = microtime(true) - $startTime;
-        //convert to millseconds (most common)
+        //convert to milliseconds
         $endTime *= 1000;
 
-        if ($this->checkForLogger()) {
-            $this->logger->info(sprintf("Finished %s in %.3f milliseconds", $task, $endTime));
-        }
+        $this->logMessage(sprintf("Finished %s in %.3f milliseconds", $task, $endTime));
 
         return $endTime;
     }
 
-    /**
-     * @param mixed $var
-     * @return bool
-     */
-    public function log($var): bool
+    public function logVar(mixed $var): void
     {
-        if (!$this->checkForLogger()) {
-            return false;
+        if (!$this->loggingEnabled()) {
+            return;
         }
 
-        $result = $this->vdump($var);
-
-        if ($result) {
+        if ($result = $this->vdump($var)) {
             $this->logger->debug($result);
         }
-        return true;
     }
 
-    /**
-     * @param mixed $var
-     * @param boolean $echo
-     * @return ?string
-     */
-    public function vdump($var, bool $echo = false): ?string
+    public function logMessage(string $message): void
+    {
+        if (!$this->loggingEnabled()) {
+            return;
+        }
+
+        $this->logger->info($message);
+    }
+
+    public function vdump(mixed $var, bool $echo = false): ?string
     {
         if (extension_loaded('xdebug')) {
             $xd_ovd = ini_get('xdebug.overload_var_dump');
@@ -135,34 +99,31 @@ class JKDumper
             $output = ob_get_clean();
 
             // neaten the newlines and indents
-            $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", trim($output));
+            $output = preg_replace("/\]\=\>\n(\s+)/m", "] => ", trim((string) $output));
 
             if ($echo) {
                 $this->echoData($output);
             }
+            /* @phpstan-ignore-next-line */
         } catch (Exception $e) {
-            if (isset($xd_ovd)) {
-                //lets get back xdebug pretty dumping state
-                ini_set('xdebug.overload_var_dump', $xd_ovd);
-            }
-            throw $e;
+            $this->logMessage(sprintf("ERROR: JKDumper error: %s", $e->getMessage()));
         }
 
-        return $output;
+        if (isset($xd_ovd)) {
+            //lets get back xdebug pretty dumping state
+            ini_set('xdebug.overload_var_dump', (string) $xd_ovd);
+        }
+
+        return $output ?? null;
     }
 
-    /**
-     * @param string $output
-     * @return void
-     */
     private function echoData(string $output): void
     {
-        if (in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg'))
-            || substr(PHP_SAPI, 0, 3) === 'cgi')
-        {
+        if (in_array(PHP_SAPI, array('cli', 'cli-server', 'phpdbg')) || str_starts_with(PHP_SAPI, 'cgi')) {
             echo(PHP_EOL . $output . PHP_EOL);
-        } else {
-            echo("<pre>" . $output . "</pre>");
+            return;
         }
+
+        echo("<pre>" . $output . "</pre>");
     }
 }
