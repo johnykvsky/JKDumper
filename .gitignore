@@ -3,8 +3,10 @@ vendor/
 coverage.xml
 coverage/
 .settings/
-.idea/
 .project
 .buildpath
+.idea/
 /tests/logs/*
 .phpunit.result.cache
+.phpunit.cache
+phpunit
